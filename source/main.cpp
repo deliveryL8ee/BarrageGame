@@ -64,10 +64,13 @@ int main() {
      GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 
-     glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
+     //glm::ortho(left, right, bottom, top)
+     glm::mat4 Projection = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, 0.0f, 10.0f);
+
+     //glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
 
      glm::mat4 View = glm::lookAt(
-	       glm::vec3(0,0,30),
+	       glm::vec3(0,0,1),
 	       glm::vec3(0,0,0),
 	       glm::vec3(0,1,0)
 	       );
@@ -123,10 +126,7 @@ int main() {
 	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	  computeMatricesFromInputs();
-	  /*射影位置を取得する*/
-	  glm::mat4 ProjectionMatrix = getProjectionMatrix();
 	  /*カメラの位置を取得する*/
-	  glm::mat4 ViewMatrix = glm::mat4(1.0f);
 	  glm::mat4 ModelMatrix = getModelMatrix();
 	  glm::mat4 MVP = Projection * View * ModelMatrix;
 
