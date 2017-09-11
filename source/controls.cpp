@@ -6,7 +6,6 @@ extern GLFWwindow* window;
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-using namespace glm;
 
 #include "controls.hpp"
 
@@ -41,8 +40,6 @@ float speed = 5.0f; // 3 units / second
 
 void computeMatricesFromInputs(){
 
-	std::cout << "(" << Xpos << " ," << Ypos << ")" << std::endl;
-     
      // Move forward
      if (glfwGetKey(window, 'W') == GLFW_PRESS){
 	  Ypos += 1.0f * speed;
