@@ -19,6 +19,8 @@ GLFWwindow* window;
 #include "controls.hpp"
 
 int main() {
+     float width = 1024.0f;
+     float height = 768.0f;
 
      if(!glfwInit()) {
 	  std::cout << "GLFWの初期化に失敗しました。" << std::endl;
@@ -31,7 +33,7 @@ int main() {
      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
      //Windowを開き、OpenGLコンテキストを作る
-     window = glfwCreateWindow(1024, 768, "BarrageGame", NULL, NULL);
+     window = glfwCreateWindow(width, height, "BarrageGame", NULL, NULL);
      if(window == NULL) {
 	  std::cout << "GLFWウィンドウのオープンに失敗しました。もしIntelのGPUならば、3.3に対応していません。チュートリアルのバージョン2.1を試してください。" << std::endl;
 	  glfwTerminate();
@@ -64,29 +66,19 @@ int main() {
      GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 
-     //glm::ortho(left, right, bottom, top)
-     glm::mat4 Projection = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, 0.0f, 10.0f);
+     //射影行列
+     //glm::ortho(left, right, bottom, top, near, far)
+     glm::mat4 Projection = glm::ortho(0.0f, width, 0.0f, height, 0.0f, 5.0f);
 
-     //glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
-
+     //カメラ行列
      glm::mat4 View = glm::lookAt(
 	       glm::vec3(0,0,1),
 	       glm::vec3(0,0,0),
 	       glm::vec3(0,1,0)
 	       );
-
-     glm::mat4 OriginalVector = glm::mat4(1.0f); //変化させる行列
-     //拡大縮小行列
-     glm::mat4 ScalingMatrix = glm::scale(OriginalVector, glm::vec3(1.0f));
-     //回転行列
-     glm::mat4 RotationMatrix =  glm::rotate(ScalingMatrix, 0.0f, glm::vec3(1.0f));
-     //平行移動行列
-     glm::mat4 TranslationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f));
-     //行列変換
-     glm::mat4 TransformedVector = TranslationMatrix * RotationMatrix;
      
-     //変換後の行列をモデル行列として採用
-     glm::mat4 Model = TransformedVector;
+     //モデル行列
+     glm::mat4 Model = glm::mat4(1.0f);
 
      glm::mat4 MVP = Projection * View * Model;
 

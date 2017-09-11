@@ -3,6 +3,5 @@
 
 void computeMatricesFromInputs();
 glm::mat4 getModelMatrix();
-glm::mat4 getProjectionMatrix();
 
 #endif
