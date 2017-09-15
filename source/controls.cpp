@@ -8,6 +8,7 @@ extern GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "controls.hpp"
+#include "Bullet.hpp"
 
 float width = 1024.0f;
 float height = 768.0f;
@@ -29,39 +30,53 @@ glm::mat4 getModelMatrix(){
 
 
 // Initial model position
-float Xpos = width/2.0f;
-float Ypos = height/2.0f;
+float posX = width/2.0f;
+float posY = height/2.0f;
 
 // Initial Field of View
 float initialFoV = 45.0f;
-
-float speed = 5.0f; // 3 units / second
+//speed of player moving
+float speed = 5.0f;
 
 
 void computeMatricesFromInputs(){
-
      // Move forward
      if (glfwGetKey(window, 'W') == GLFW_PRESS){
-	  Ypos += 1.0f * speed;
-	  if(Ypos > height-scaleV) Ypos = height-scaleV;
+	  posY += 1.0f * speed;
+	  if(posY > height-scaleV) posY = height-scaleV;
      }
      // Move backward
      if (glfwGetKey(window, 'S') == GLFW_PRESS){
-	  Ypos -= 1.0f * speed;
-	  if(Ypos < 0.0f+scaleV) Ypos = 0.0f+scaleV;
+	  posY -= 1.0f * speed;
+	  if(posY < 0.0f+scaleV) posY = 0.0f+scaleV;
      }
      // Strafe right
      if (glfwGetKey(window, 'D') == GLFW_PRESS){
-	  Xpos += 1.0f * speed;
-	  if(Xpos > width-scaleV) Xpos = width-scaleV;
+	  posX += 1.0f * speed;
+	  if(posX > width-scaleV) posX = width-scaleV;
      }
      // Strafe left
      if (glfwGetKey(window, 'A') == GLFW_PRESS){
-	  Xpos -= 1.0f * speed;
-	  if(Xpos < 0.0f+scaleV) Xpos = 0.0f+scaleV;
+	  posX -= 1.0f * speed;
+	  if(posX < 0.0f+scaleV) posX = 0.0f+scaleV;
+     }
+     
+     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+	  myBullet.setParameter(posX, posY, 0.0f, 10.0f);
+	  myBullet.activate();
+	  
      }
 
-     TranslationMatrix = glm::translate(glm::mat4(), glm::vec3(Xpos,Ypos,1.0f));
+
+     TranslationMatrix = glm::translate(glm::mat4(), glm::vec3(posX,posY,1.0f));
      ModelMatrix = TranslationMatrix * ScalingMatrix * OriginalVector;
 
 }
+/*
+bool PressSPACE() {
+     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+	  return true;
+     }
+     return false;
+}
+*/

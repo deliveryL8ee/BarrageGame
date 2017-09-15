@@ -18,9 +18,13 @@ GLFWwindow* window;
 //Include Controller 
 #include "controls.hpp"
 
+//Include Bullet 
+#include "Bullet.hpp"
+
 int main() {
      float width = 1024.0f;
      float height = 768.0f;
+
 
      if(!glfwInit()) {
 	  std::cout << "GLFWの初期化に失敗しました。" << std::endl;
@@ -117,10 +121,14 @@ int main() {
 
 	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	  //プレイヤーの移動計算
 	  computeMatricesFromInputs();
-	  /*カメラの位置を取得する*/
 	  glm::mat4 ModelMatrix = getModelMatrix();
 	  glm::mat4 MVP = Projection * View * ModelMatrix;
+
+	  //弾幕の移動計算
+	  myBullet.tick();
+	  //myBullet.draw();
 
 	  glUseProgram(programID);
 	  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
