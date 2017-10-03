@@ -72,11 +72,3 @@ void computeMatricesFromInputs(){
      ModelMatrix = TranslationMatrix * ScalingMatrix * OriginalVector;
 
 }
-/*
-bool PressSPACE() {
-     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-	  return true;
-     }
-     return false;
-}
-*/

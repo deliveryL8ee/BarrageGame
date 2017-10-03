@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <cmath>
 
 //Include GLEW
 #include <GL/glew.h>
@@ -67,8 +69,6 @@ int main() {
 
      GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.flagmentshader");
 
-     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
 
      //射影行列
      //glm::ortho(left, right, bottom, top, near, far)
@@ -82,13 +82,18 @@ int main() {
 	       );
      
      //モデル行列
-     glm::mat4 Model = glm::mat4(1.0f);
+     glm::mat4 Model = glm::translate(glm::mat4(), glm::vec3(100.0f,100.0f,1.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(100.0f));
 
-     glm::mat4 MVP = Projection * View * Model;
+     glm::mat4 MVP = Projection * View * glm::mat4(1.0f);
+
+     glm::mat4 MVP2 = Projection * View * Model;
+
+     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 
+	//プレイヤーを表す配列
+	//頂点情報
      static const GLfloat g_vertex_buffer_data[] = { 
-	  //プレイヤー
 	  -1.0f, 1.0f, 0.0f,
 	  -1.0f,-1.0f, 0.0f,
 	   1.0f, 1.0f, 0.0f,
@@ -97,6 +102,7 @@ int main() {
 	   1.0f,-1.0f, 0.0f,
      };
 
+	//色情報
      static const GLfloat g_color_buffer_data[] = { 
 	  0.583f,  0.771f,  0.014f,
 	  0.609f,  0.115f,  0.436f,
@@ -105,6 +111,29 @@ int main() {
 	  0.435f,  0.602f,  0.223f,
 	  0.310f,  0.747f,  0.185f,
      };
+
+	//可変長の弾幕配列
+	std::vector <GLfloat> circle_vertex_buffer_data;		//頂点情報
+	std::vector <GLfloat> circle_color_buffer_data;		//色情報
+
+	circle_vertex_buffer_data.push_back(0);
+	circle_vertex_buffer_data.push_back(0);
+	circle_vertex_buffer_data.push_back(0);
+	circle_color_buffer_data.push_back(1);
+	circle_color_buffer_data.push_back(1);
+	circle_color_buffer_data.push_back(1);
+	
+	const int n_gon = 16;
+
+	for(int i = 0; i < n_gon+1; i++) {
+		circle_vertex_buffer_data.push_back(cos(M_PI*2/n_gon*i));
+		circle_vertex_buffer_data.push_back(sin(M_PI*2/n_gon*i));
+		circle_vertex_buffer_data.push_back(0);
+		circle_color_buffer_data.push_back(1);
+		circle_color_buffer_data.push_back(1);
+		circle_color_buffer_data.push_back(1);
+	}
+
 
      GLuint vertexbuffer;
      glGenBuffers(1, &vertexbuffer);
@@ -115,6 +144,16 @@ int main() {
      glGenBuffers(1, &colorbuffer);
      glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
      glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+     GLuint c_vertexbuffer;
+     glGenBuffers(1, &c_vertexbuffer);
+     glBindBuffer(GL_ARRAY_BUFFER, c_vertexbuffer);
+     glBufferData(GL_ARRAY_BUFFER, circle_vertex_buffer_data.size()*sizeof(GLfloat), &circle_vertex_buffer_data[0], GL_STATIC_DRAW);
+
+     GLuint c_colorbuffer;
+     glGenBuffers(1, &c_colorbuffer);
+     glBindBuffer(GL_ARRAY_BUFFER, c_colorbuffer);
+     glBufferData(GL_ARRAY_BUFFER, circle_color_buffer_data.size()*sizeof(GLfloat), &circle_color_buffer_data[0], GL_STATIC_DRAW);
 
      while(glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 	       glfwWindowShouldClose(window) == 0){
@@ -128,14 +167,18 @@ int main() {
 
 	  //弾幕の移動計算
 	  myBullet.tick();
-	  //myBullet.draw();
 
+
+	  /*プレイヤーの描写開始*/
 	  glUseProgram(programID);
 	  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
 
 	  //declare buffers
 	  glEnableVertexAttribArray(0);
 	  glEnableVertexAttribArray(1);
+	  glEnableVertexAttribArray(2);
+	  glEnableVertexAttribArray(3);
 
 	  //vertexbuffers
 	  glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);
@@ -159,12 +202,46 @@ int main() {
 		    (void*)0		//配列バッファオフセット
 		    );
 
-
-	  //三角形を描く
 	  glDrawArrays(GL_TRIANGLES, 0, 3*2); //頂点0 ~ 3*2 (3頂点 = 1三角形 -> 2三角形 = 四角形 = 6頂点)
+	  /*プレイヤーの描写終了*/
+
+
+	  /*弾幕の描写開始*/
+	  //myBullet.draw();
+	  glUseProgram(programID);
+	  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP2[0][0]);
+
+	  //vertexbuffers
+	  glBindBuffer(GL_ARRAY_BUFFER,c_vertexbuffer);
+	  glVertexAttribPointer(
+		    0,			//属性
+		    3,			//サイズ
+		    GL_FLOAT,		//型
+		    GL_FALSE,		//正規化
+		    0,			//ストライド
+		    (void*)0		//配列バッファオフセット
+		    );
+
+	  //colorbuffers
+	  glBindBuffer(GL_ARRAY_BUFFER,c_colorbuffer);
+	  glVertexAttribPointer(
+		    1,			//属性
+		    3,			//サイズ
+		    GL_FLOAT,		//型
+		    GL_FALSE,		//正規化
+		    0,			//ストライド
+		    (void*)0		//配列バッファオフセット
+		    );
+
+
+
+	  glDrawArrays(GL_TRIANGLE_FAN, 0, circle_vertex_buffer_data.size()*sizeof(GLfloat));
+	  /*弾幕の描写終了*/
 
 	  glDisableVertexAttribArray(0);
 	  glDisableVertexAttribArray(1);
+	  glDisableVertexAttribArray(2);
+	  glDisableVertexAttribArray(3);
 
 	  glfwSwapBuffers(window);
 	  glfwPollEvents();
@@ -172,6 +249,8 @@ int main() {
 
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &colorbuffer);
+	glDeleteBuffers(1, &c_vertexbuffer);
+	glDeleteBuffers(1, &c_colorbuffer);
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
