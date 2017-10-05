@@ -72,7 +72,7 @@ class Bullet {
 
 };
 
-extern Bullet myBullet;
+extern std::vector <Bullet*> BulletList;
 
 
 #endif

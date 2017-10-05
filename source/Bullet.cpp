@@ -4,6 +4,7 @@ Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f) {
 }
 
 Bullet::Bullet(float posX, float posY, float speedX, float speedY): posX(posX), posY(posY), speedX(speedX), speedY(speedY){
+	createVertex();
 }
 
 Bullet::Bullet(const Bullet& rhs): Bullet(rhs.posX, rhs.posY, rhs.speedX, rhs.speedY){
@@ -64,13 +65,11 @@ void Bullet::activate(){
 }
 
 void Bullet::tick(){
-	std::cout << "(" << posX << "," << posY << ")" << std::endl;
 	if (isActive == true) {
 		posX += speedX;
 		posY += speedY;
-		std::cout << "(" << posX << "," << posY << ")" << std::endl;
 
-		if(posY > height+10.0f) {
+		if(posY-10.0f > height+10.0f) {
 			isActive = false;
 		}
 
@@ -80,7 +79,7 @@ void Bullet::tick(){
 
 
 void Bullet::draw() {
-	BltModel = glm::translate(glm::mat4(), glm::vec3(posX,posY,1.0f)) * glm::scale(glm::mat4(1.0f),glm::vec3(10.f));
+	BltModel = glm::translate(glm::mat4(), glm::vec3(posX,posY-10.0f,1.0f)) * glm::scale(glm::mat4(1.0f),glm::vec3(10.0f));
 	BltMVP = BltProjection * BltView * BltModel;
 
 	glUniformMatrix4fv(BltMatrixID, 1, GL_FALSE, &BltMVP[0][0]);
@@ -116,8 +115,11 @@ void Bullet::draw() {
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
+	/*if(!isActive) {
+		BulletList.pop_back();
+	}*/
 
 }
 
-Bullet myBullet;
+std::vector <Bullet*> BulletList;
 

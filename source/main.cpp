@@ -26,6 +26,8 @@ GLFWwindow* window;
 int main() {
 	float width = 1024.0f;
 	float height = 768.0f;
+	
+	const int Bnum = 10;
 
 
 	if(!glfwInit()) {
@@ -123,9 +125,6 @@ int main() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
 
-	//弾幕の初期化
-	myBullet.createVertex();
-
 
 	/*
 	 * == メインループ =========================================================================
@@ -176,11 +175,14 @@ int main() {
 		/*プレイヤーの描写終了*/
 
 
-		//弾幕の移動計算
-		myBullet.tick();
+		for(auto bullet : BulletList){
+			//弾幕の移動計算
+			bullet->tick();
 
-		/*弾幕の描写*/
-		myBullet.draw();
+			/*弾幕の描写*/
+			bullet->draw();
+
+		}
 
 
 
@@ -193,7 +195,11 @@ int main() {
 
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &colorbuffer);
-	myBullet.deleteVertex();
+
+	//使用済み弾幕の消去
+	for(auto bullet : BulletList){
+		bullet->deleteVertex();
+	}
 
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
