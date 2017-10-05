@@ -1,15 +1,27 @@
 #ifndef BULLET_HPP
 #define BULLET_HPP
 
+#include <vector>
+#include <cmath>
+
+//Include GLEW
+#include <GL/glew.h>
+
 
 // Include GLFW
 #include <GLFW/glfw3.h>
 #include <iostream>
-extern GLFWwindow* window;
+
 
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
+extern GLFWwindow* window;
+
+
+#include "shader.hpp"
 
 #include "controls.hpp"
 
@@ -23,7 +35,15 @@ class Bullet {
      float speedX;
      float speedY;
 
+	std::vector <GLfloat> circle_vertex_buffer_data;		//頂点情報
+	std::vector <GLfloat> circle_color_buffer_data;		//色情報
+
      bool isActive;
+
+	glm::mat4 BltProjection;
+	glm::mat4 BltView;
+	glm::mat4 BltModel;
+	glm::mat4 BltMVP;
 
      public:
      Bullet();
@@ -37,10 +57,18 @@ class Bullet {
 	  this->speedY = rhs.speedY;
      }
 
+	GLuint c_vertexbuffer;
+	GLuint c_colorbuffer;
+
+	GLuint BltProgramID;
+	GLuint BltMatrixID;
+
+	void createVertex();
+	void deleteVertex();
      void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY);
      void activate();
-     //1フレーム毎に動かす
      void tick();
+     void draw();
 
 };
 

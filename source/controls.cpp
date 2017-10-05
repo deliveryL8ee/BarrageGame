@@ -1,14 +1,5 @@
-// Include GLFW
-#include <GLFW/glfw3.h>
-#include <iostream>
-extern GLFWwindow* window;
-
-// Include GLM
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "controls.hpp"
-#include "Bullet.hpp"
 
 float width = 1024.0f;
 float height = 768.0f;
