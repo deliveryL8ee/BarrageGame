@@ -29,8 +29,6 @@ float initialFoV = 45.0f;
 //speed of player moving
 float speed = 5.0f;
 
-int Bpoint = 0;
-
 void computeMatricesFromInputs(){
      // Move forward
      if (glfwGetKey(window, 'W') == GLFW_PRESS){
@@ -54,11 +52,9 @@ void computeMatricesFromInputs(){
      }
      
      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			BulletList.push_back(new Bullet());						//弾幕の作成
-			BulletList[Bpoint]->setParameter(posX, posY, 0.0f, 10.0f);		//弾幕にパラメータをセット
-			BulletList[Bpoint]->activate();							//弾幕をアクティブにする
+		BulletList.push_back(new Bullet());							//弾幕の作成
+		BulletList[BulletList.size()-1]->setParameter(posX, posY, 0.0f, 15.0f, BulletList.size()-1);		//弾幕にパラメータをセット
 
-			Bpoint++;
      }
 
 

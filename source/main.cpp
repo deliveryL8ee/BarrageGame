@@ -27,8 +27,6 @@ int main() {
 	float width = 1024.0f;
 	float height = 768.0f;
 	
-	const int Bnum = 10;
-
 
 	if(!glfwInit()) {
 		std::cout << "GLFWの初期化に失敗しました。" << std::endl;
@@ -126,6 +124,7 @@ int main() {
 
 
 
+	int i = 0;
 	/*
 	 * == メインループ =========================================================================
 	 */
@@ -180,9 +179,13 @@ int main() {
 			bullet->tick();
 
 			/*弾幕の描写*/
-			bullet->draw();
+			bullet->draw(MatrixID);
 
 		}
+
+
+		//std::cout << BulletList.size() << std::endl;			//削除されているか(配列の長さ)の確認
+
 
 
 
@@ -205,5 +208,6 @@ int main() {
 	glDeleteVertexArrays(1, &VertexArrayID);
 
 	glfwTerminate();
+
 
 }

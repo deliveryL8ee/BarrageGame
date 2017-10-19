@@ -13,8 +13,7 @@ controls.o: controls.cpp
 Bullet.o: Bullet.cpp
 	g++ --std=c++14 -c Bullet.cpp
 
-
 clean:
 	rm main.o shader.o controls.o Bullet.o
-
 	
+

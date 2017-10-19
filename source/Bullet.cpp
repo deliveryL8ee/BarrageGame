@@ -1,13 +1,13 @@
 #include "Bullet.hpp"
 
-Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f) {
+Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
 }
 
-Bullet::Bullet(float posX, float posY, float speedX, float speedY): posX(posX), posY(posY), speedX(speedX), speedY(speedY){
+Bullet::Bullet(float posX, float posY, float speedX, float speedY, int id): posX(posX), posY(posY), speedX(speedX), speedY(speedY), id(id){
 	createVertex();
 }
 
-Bullet::Bullet(const Bullet& rhs): Bullet(rhs.posX, rhs.posY, rhs.speedX, rhs.speedY){
+Bullet::Bullet(const Bullet& rhs): Bullet(rhs.posX, rhs.posY, rhs.speedX, rhs.speedY, rhs.id){
 }
 
 
@@ -38,14 +38,12 @@ void Bullet::createVertex(){
 	glBindBuffer(GL_ARRAY_BUFFER, c_colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, circle_color_buffer_data.size()*sizeof(GLfloat), &circle_color_buffer_data[0], GL_STATIC_DRAW);
 
-     BltProgramID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.flagmentshader");
 
      BltProjection = glm::ortho(0.0f, width, 0.0f, height, 0.0f, 5.0f);
      BltView = glm::lookAt(glm::vec3(0,0,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
 	BltModel = glm::mat4(1.0f);
 	BltMVP = BltProjection * BltView * BltModel;
 
-     BltMatrixID = glGetUniformLocation(BltProgramID, "MVP");
 }
 
 void Bullet::deleteVertex() {
@@ -53,36 +51,47 @@ void Bullet::deleteVertex() {
 	glDeleteBuffers(1, &c_colorbuffer);
 }
 
-void Bullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY) {
+void Bullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id) {
 	posX = P_posX;
 	posY = P_posY;
 	speedX = P_speedX;
 	speedY = P_speedY;
+	id = P_id;
+
+
 }
 
-void Bullet::activate(){
-	isActive = true;
+//受け取ったIDに該当する弾幕に新しく生成した弾幕情報を上書きし、削除する
+void Bullet::deleteBullet(int id) {
+	delete BulletList[id];
+	BulletList[id] = BulletList[BulletList.size()-1];
+	BulletList[id]->setID(id);
+	BulletList.pop_back();
 }
 
+void Bullet::setID(int id) {
+	this->id = id;
+}
+
+//アクティブな弾幕を進め、そうでなければ削除する
 void Bullet::tick(){
-	if (isActive == true) {
-		posX += speedX;
-		posY += speedY;
+	posX += speedX;
+	posY += speedY;
 
-		if(posY-10.0f > height+10.0f) {
-			isActive = false;
-		}
-
+	if(posY-10.0f > height+10.0f) {
+		deleteBullet(id);			//使い終わった弾幕を削除する
+		
 	}
+
 }
 
 
-
-void Bullet::draw() {
+//弾幕の頂点情報を渡して描画する
+void Bullet::draw(GLuint MatrixID) {
 	BltModel = glm::translate(glm::mat4(), glm::vec3(posX,posY-10.0f,1.0f)) * glm::scale(glm::mat4(1.0f),glm::vec3(10.0f));
 	BltMVP = BltProjection * BltView * BltModel;
 
-	glUniformMatrix4fv(BltMatrixID, 1, GL_FALSE, &BltMVP[0][0]);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &BltMVP[0][0]);
 
 	//declare buffers
 	glEnableVertexAttribArray(0);
@@ -115,11 +124,8 @@ void Bullet::draw() {
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
-	/*if(!isActive) {
-		BulletList.pop_back();
-	}*/
 
 }
 
-std::vector <Bullet*> BulletList;
+std::vector<Bullet*> BulletList;
 

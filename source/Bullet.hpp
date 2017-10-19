@@ -34,11 +34,10 @@ class Bullet {
      float posY;
      float speedX;
      float speedY;
+	int id;
 
 	std::vector <GLfloat> circle_vertex_buffer_data;		//頂点情報
 	std::vector <GLfloat> circle_color_buffer_data;		//色情報
-
-     bool isActive;
 
 	glm::mat4 BltProjection;
 	glm::mat4 BltView;
@@ -47,7 +46,7 @@ class Bullet {
 
      public:
      Bullet();
-     Bullet(float posX, float posY, float speedX, float speedY);
+     Bullet(float posX, float posY, float speedX, float speedY, int id);
      Bullet(const Bullet& rhs);
 
      Bullet& operator=(const Bullet& rhs){
@@ -55,6 +54,7 @@ class Bullet {
 	  this->posY   = rhs.posY;
 	  this->speedX = rhs.speedX;
 	  this->speedY = rhs.speedY;
+	  this->id   = rhs.id;
      }
 
 	GLuint c_vertexbuffer;
@@ -65,14 +65,15 @@ class Bullet {
 
 	void createVertex();
 	void deleteVertex();
-     void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY);
-     void activate();
+     void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id);
+	void deleteBullet(int id);
+	void setID(int id);
      void tick();
-     void draw();
+     void draw(GLuint MatrixID);
 
 };
 
-extern std::vector <Bullet*> BulletList;
+extern std::vector<Bullet*> BulletList;
 
 
 #endif
