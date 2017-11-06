@@ -123,17 +123,11 @@ int main() {
 	circle_vertex_buffer_data.push_back(0.0f);
 	circle_vertex_buffer_data.push_back(0.0f);
 	circle_vertex_buffer_data.push_back(0.0f);
-	circle_color_buffer_data.push_back(1.0f);
-	circle_color_buffer_data.push_back(1.0f);
-	circle_color_buffer_data.push_back(1.0f);
 
 	for(int i = 0; i < n_gon+1; i++) {
 		circle_vertex_buffer_data.push_back(cos(M_PI*2/n_gon*i));
 		circle_vertex_buffer_data.push_back(sin(M_PI*2/n_gon*i));
 		circle_vertex_buffer_data.push_back(0.0f);
-		circle_color_buffer_data.push_back(1.0f);
-		circle_color_buffer_data.push_back(1.0f);
-		circle_color_buffer_data.push_back(1.0f);
 	}
 
 
@@ -155,8 +149,6 @@ int main() {
 
 	GLuint c_colorbuffer;
 	glGenBuffers(1, &c_colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, c_colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, circle_color_buffer_data.size()*sizeof(GLfloat), &circle_color_buffer_data[0], GL_STATIC_DRAW);
 
 	GLuint c_modelbuffer;
 	glGenBuffers(1, &c_modelbuffer);
@@ -217,6 +209,10 @@ int main() {
 		glUseProgram(c_programID);
 		glUniformMatrix4fv(c_MatrixID, 1, GL_FALSE, &c_VP[0][0]);
 
+		//弾幕に透明度を持たせるためのブレンド関数
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		//弾幕の移動計算
 		for(auto bullet : BulletList){
 			bullet->tick();
@@ -227,23 +223,26 @@ int main() {
 		glVertexAttribPointer(2,	3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		//Bullet colorbuffers
-		glBindBuffer(GL_ARRAY_BUFFER,c_colorbuffer);
-		glVertexAttribPointer(3,	3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, c_colorbuffer);
+		glBufferData(GL_ARRAY_BUFFER, circle_color_buffer_data.size()*sizeof(GLfloat), &circle_color_buffer_data[0], GL_STATIC_DRAW);
+
+		glVertexAttribPointer(3,	4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexAttribDivisor(3, 1);
 
 		//Bullet modelbuffers
 		glBindBuffer(GL_ARRAY_BUFFER, c_modelbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4)*ModelMatrixVector.size(), &ModelMatrixVector[0], GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ARRAY_BUFFER, c_modelbuffer);
 		glVertexAttribPointer(4,	4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*0));
 		glVertexAttribPointer(5,	4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*1));
 		glVertexAttribPointer(6,	4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*2));
 		glVertexAttribPointer(7,	4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*3));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glVertexAttribDivisor(4, 1); // 色：四角形ごとに一つ->1
-		glVertexAttribDivisor(5, 1); // 色：四角形ごとに一つ->1
-		glVertexAttribDivisor(6, 1); // 色：四角形ごとに一つ->1
-		glVertexAttribDivisor(7, 1); // 色：四角形ごとに一つ->1
+		glVertexAttribDivisor(4, 1); // 色：弾ごとに一つ->1
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
 
 		glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, n_gon+2, BulletList.size());
 

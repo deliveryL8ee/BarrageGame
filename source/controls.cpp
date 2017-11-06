@@ -54,6 +54,13 @@ void computeMatricesFromInputs(){
      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		BulletList.push_back(new Bullet());							//弾幕の作成
 		BulletList[BulletList.size()-1]->setParameter(posX, posY, 0.0f, 15.0f, BulletList.size()-1);		//弾幕にパラメータをセット
+		BulletList.push_back(new Bullet());							//弾幕の作成
+		BulletList[BulletList.size()-1]->setParameter(posX, posY, 2.0f, 15.0f, BulletList.size()-1);		//弾幕にパラメータをセット
+		BulletList.push_back(new Bullet());							//弾幕の作成
+		BulletList[BulletList.size()-1]->setParameter(posX, posY, -2.0f, 15.0f, BulletList.size()-1);		//弾幕にパラメータをセット
+
+		ModelMatrixVector.push_back(glm::mat4());
+		ModelMatrixVector.push_back(glm::mat4());
 		ModelMatrixVector.push_back(glm::mat4());
      }
 

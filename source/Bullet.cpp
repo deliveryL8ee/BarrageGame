@@ -1,6 +1,17 @@
+#include <random>
 #include "Bullet.hpp"
 
 Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
+	//乱数によって弾幕を様々な色に設定する
+	std::random_device rnd;
+	std::mt19937 mt(rnd());
+	std::uniform_real_distribution<float> rand1(0,1);
+	std::uniform_real_distribution<float> rand2(1,2);
+
+	circle_color_buffer_data.push_back(rand1(mt));
+	circle_color_buffer_data.push_back(rand1(mt));
+	circle_color_buffer_data.push_back(rand1(mt));
+	circle_color_buffer_data.push_back(rand2(mt)/2);
 }
 
 Bullet::Bullet(float posX, float posY, float speedX, float speedY, int id): posX(posX), posY(posY), speedX(speedX), speedY(speedY), id(id){
@@ -16,7 +27,6 @@ void Bullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_sp
 	speedX = P_speedX;
 	speedY = P_speedY;
 	id = P_id;
-
 }
 
 //受け取ったIDに該当する弾幕に新しく生成した弾幕情報を上書きし、削除する
