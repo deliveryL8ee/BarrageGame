@@ -36,13 +36,7 @@ class Bullet {
      float speedY;
 	int id;
 
-	std::vector <GLfloat> circle_vertex_buffer_data;		//頂点情報
-	std::vector <GLfloat> circle_color_buffer_data;		//色情報
-
-	glm::mat4 BltProjection;
-	glm::mat4 BltView;
-	glm::mat4 BltModel;
-	glm::mat4 BltMVP;
+	glm::mat4 c_Model;
 
      public:
      Bullet();
@@ -57,14 +51,6 @@ class Bullet {
 	  this->id   = rhs.id;
      }
 
-	GLuint c_vertexbuffer;
-	GLuint c_colorbuffer;
-
-	GLuint BltProgramID;
-	GLuint BltMatrixID;
-
-	void createVertex();
-	void deleteVertex();
      void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id);
 	void deleteBullet(int id);
 	void setID(int id);
@@ -74,6 +60,9 @@ class Bullet {
 };
 
 extern std::vector<Bullet*> BulletList;
+extern std::vector<GLfloat> circle_vertex_buffer_data;		//頂点情報
+extern std::vector<GLfloat> circle_color_buffer_data;		//色情報
+extern std::vector<glm::mat4> ModelMatrixVector;
 
 
 #endif

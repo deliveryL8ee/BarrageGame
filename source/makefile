@@ -1,5 +1,5 @@
 barragegame: main.o shader.o controls.o Bullet.o
-	g++ --std=c++14 -o barragegame main.o shader.o controls.o Bullet.o -lGL -lGLU -lglfw -lXrandr -lXinerama -lXcursor -lXi -lXxf86vm -lX11 -lrt -lm -lpthread -lGLEW -ldl
+	g++ --std=c++14 -o barragegame main.o shader.o controls.o Bullet.o -lGL -lGLU -lglfw -lXrandr -lXi -lXxf86vm -lX11 -lrt -lm -lpthread -lGLEW -ldl
 
 main.o: main.cpp
 	g++ --std=c++14 -c main.cpp 
