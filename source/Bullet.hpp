@@ -26,7 +26,7 @@ extern GLFWwindow* window;
 #include "controls.hpp"
 
 class Bullet {
-     float width = 1024.0f;
+     float width = 768.0f;
      float height = 768.0f;
 
      private:
@@ -55,7 +55,6 @@ class Bullet {
 	void deleteBullet(int id);
 	void setID(int id);
      void tick();
-     void draw(GLuint MatrixID);
 
 };
 

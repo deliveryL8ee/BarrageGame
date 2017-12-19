@@ -23,8 +23,11 @@ GLFWwindow* window;
 //Include Bullet 
 #include "Bullet.hpp"
 
+//Include Enemy
+#include "Enemy.hpp"
+
 int main() {
-	float width = 1024.0f;
+	float width = 768.0f;
 	float height = 768.0f;
 	
 
@@ -69,6 +72,7 @@ int main() {
 
 	GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
 	GLuint c_programID = LoadShaders("BulletVertexShader.vertexshader", "BulletFragmentShader.fragmentshader");
+	GLuint e_programID = LoadShaders("EnemyVertexShader.vertexshader", "EnemyFragmentShader.fragmentshader");
 
 
 	//射影行列
@@ -90,14 +94,17 @@ int main() {
      glm::mat4 c_View = glm::lookAt(glm::vec3(0,0,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
      glm::mat4 c_VP = c_Projection * c_View;
 
+	glm::mat4 e_MVP = Projection * View * Model;
+
 
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 	GLuint c_MatrixID = glGetUniformLocation(c_programID, "c_VP");
+	GLuint e_MatrixID = glGetUniformLocation(e_programID, "e_MVP");
 
 
 	/*プレイヤーを表す配列*/
 	//頂点情報
-	static const GLfloat g_vertex_buffer_data[] = { 
+	static const GLfloat player_vertex_buffer_data[] = { 
 		-1.0f, 1.0f, 0.0f,
 		-1.0f,-1.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,
@@ -107,7 +114,7 @@ int main() {
 	};
 
 	//色情報
-	static const GLfloat g_color_buffer_data[] = { 
+	static const GLfloat player_color_buffer_data[] = { 
 		0.583f,  0.771f,  0.014f,
 		0.609f,  0.115f,  0.436f,
 		0.327f,  0.483f,  0.844f,
@@ -131,16 +138,16 @@ int main() {
 	}
 
 
-	//頂点をOpenGLに渡す
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	//各情報をOpenGLに渡すためのバッファ
+	GLuint p_vertexbuffer;
+	glGenBuffers(1, &p_vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, p_vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(player_vertex_buffer_data), player_vertex_buffer_data, GL_STATIC_DRAW);
 
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	GLuint p_colorbuffer;
+	glGenBuffers(1, &p_colorbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, p_colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(player_color_buffer_data), player_color_buffer_data, GL_STATIC_DRAW);
 
 	GLuint c_vertexbuffer;
 	glGenBuffers(1, &c_vertexbuffer);
@@ -186,7 +193,7 @@ int main() {
 		MVP = Projection * View * ModelMatrix;
 
 		//vertexbuffers
-		glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER,p_vertexbuffer);
 		glVertexAttribPointer(
 				0,			//属性
 				3,			//サイズ
@@ -197,7 +204,7 @@ int main() {
 				);
 
 		//colorbuffers
-		glBindBuffer(GL_ARRAY_BUFFER,colorbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER,p_colorbuffer);
 		glVertexAttribPointer(1,	3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3*2);
@@ -249,7 +256,16 @@ int main() {
 		/*弾幕の描画終了*/
 
 
-		//std::cout << BulletList.size() << std::endl;			//削除されているか(配列の長さ)の確認
+		/*エネミーの描画開始*/
+		getFrag();	//敵の動きを制御するフラグを確立
+
+		for(auto enemy : EnemyGroup){
+			enemy->tick();
+
+			enemy->draw(e_programID, e_MatrixID);
+		}
+		
+		/*エネミーの描画終了*/
 
 
 		glDisableVertexAttribArray(0);
@@ -265,14 +281,20 @@ int main() {
 		glfwPollEvents();
 	}
 
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &colorbuffer);
+	glDeleteBuffers(1, &p_vertexbuffer);
+	glDeleteBuffers(1, &p_colorbuffer);
 	glDeleteBuffers(1, &c_vertexbuffer);
 	glDeleteBuffers(1, &c_colorbuffer);
 	glDeleteBuffers(1, &c_modelbuffer);
 
+	for(auto enemy : EnemyGroup) {
+		enemy->deleteVertex();
+	}
+
 
 	glDeleteProgram(programID);
+	glDeleteProgram(c_programID);
+	glDeleteProgram(e_programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
 	glfwTerminate();

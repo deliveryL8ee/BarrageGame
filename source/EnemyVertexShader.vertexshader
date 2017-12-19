@@ -1,0 +1,12 @@
+#version 330 core
+layout(location = 8) in vec3 vertexPosition_modelspace;
+layout(location = 9) in vec3 vertexColor;
+
+out vec3 fragmentColor;
+uniform mat4 e_MVP;
+
+void main() {
+
+     gl_Position = e_MVP * vec4(vertexPosition_modelspace, 1);
+     fragmentColor = vertexColor;
+}

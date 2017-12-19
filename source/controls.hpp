@@ -14,10 +14,11 @@ extern GLFWwindow* window;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Bullet.hpp"
+#include "Enemy.hpp"
 
 
 void computeMatricesFromInputs();
-bool PressSPACE();
+int getFrag();
 glm::mat4 getModelMatrix();
 
 #endif

@@ -8,9 +8,9 @@ Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
 	std::uniform_real_distribution<float> rand1(0,1);
 	std::uniform_real_distribution<float> rand2(1,2);
 
+	circle_color_buffer_data.push_back(1.0f);
 	circle_color_buffer_data.push_back(rand1(mt));
-	circle_color_buffer_data.push_back(rand1(mt));
-	circle_color_buffer_data.push_back(rand1(mt));
+	circle_color_buffer_data.push_back(1.0f);
 	circle_color_buffer_data.push_back(rand2(mt)/2);
 }
 
