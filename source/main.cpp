@@ -21,10 +21,13 @@ GLFWwindow* window;
 #include "controls.hpp"
 
 //Include Bullet 
-#include "Bullet.hpp"
+#include "MyBullet.hpp"
 
 //Include Enemy
 #include "Enemy.hpp"
+
+//Include Enemy
+#include "EnemyBullet.hpp"
 
 int main() {
 	float width = 768.0f;
@@ -71,8 +74,9 @@ int main() {
 	glBindVertexArray(VertexArrayID);
 
 	GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
-	GLuint c_programID = LoadShaders("BulletVertexShader.vertexshader", "BulletFragmentShader.fragmentshader");
+	GLuint c_programID = LoadShaders("MyBulletVertexShader.vertexshader", "MyBulletFragmentShader.fragmentshader");
 	GLuint e_programID = LoadShaders("EnemyVertexShader.vertexshader", "EnemyFragmentShader.fragmentshader");
+	GLuint e_c_programID = LoadShaders("EnemyBulletVertexShader.vertexshader", "EnemyBulletFragmentShader.fragmentshader");
 
 
 	//射影行列
@@ -96,10 +100,15 @@ int main() {
 
 	glm::mat4 e_MVP = Projection * View * Model;
 
+     glm::mat4 e_c_Projection = glm::ortho(0.0f, width, 0.0f, height, 0.0f, 5.0f);
+     glm::mat4 e_c_View = glm::lookAt(glm::vec3(0,0,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
+     glm::mat4 e_c_VP = e_c_Projection * e_c_View;
+
 
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 	GLuint c_MatrixID = glGetUniformLocation(c_programID, "c_VP");
 	GLuint e_MatrixID = glGetUniformLocation(e_programID, "e_MVP");
+	GLuint e_c_MatrixID = glGetUniformLocation(e_c_programID, "e_c_VP");
 
 
 	/*プレイヤーを表す配列*/
@@ -160,6 +169,16 @@ int main() {
 	GLuint c_modelbuffer;
 	glGenBuffers(1, &c_modelbuffer);
 
+	GLuint e_c_vertexbuffer;
+	glGenBuffers(1, &e_c_vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, e_c_vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, e_circle_vertex_buffer_data.size()*sizeof(GLfloat), &e_circle_vertex_buffer_data[0], GL_STATIC_DRAW);
+
+	GLuint e_c_colorbuffer;
+	glGenBuffers(1, &e_c_colorbuffer);
+
+	GLuint e_c_modelbuffer;
+	glGenBuffers(1, &e_c_modelbuffer);
 
 
 	/*
@@ -182,6 +201,12 @@ int main() {
 		glEnableVertexAttribArray(6);
 		glEnableVertexAttribArray(7);
 
+		glEnableVertexAttribArray(10);
+		glEnableVertexAttribArray(11);
+		glEnableVertexAttribArray(12);
+		glEnableVertexAttribArray(13);
+		glEnableVertexAttribArray(14);
+		glEnableVertexAttribArray(15);
 
 		/*プレイヤーの描画開始*/
 		glUseProgram(programID);
@@ -256,7 +281,7 @@ int main() {
 		/*弾幕の描画終了*/
 
 
-		/*エネミーの描画開始*/
+		/*敵の描画開始*/
 		getFrag();	//敵の動きを制御するフラグを確立
 
 		for(auto enemy : EnemyGroup){
@@ -264,8 +289,53 @@ int main() {
 
 			enemy->draw(e_programID, e_MatrixID);
 		}
+		CollisionAll();
 		
-		/*エネミーの描画終了*/
+		/*敵の描画終了*/
+
+
+		/*敵弾幕の描画開始*/
+		glUseProgram(e_c_programID);
+		glUniformMatrix4fv(e_c_MatrixID, 1, GL_FALSE, &e_c_VP[0][0]);
+
+		//敵弾幕に透明度を持たせるためのブレンド関数
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		//敵弾幕の移動計算
+		for(auto bullet : e_BulletList){
+			bullet->tick();
+		}
+
+		//EnemyBullet vertexbuffers
+		glBindBuffer(GL_ARRAY_BUFFER,e_c_vertexbuffer);
+		glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		//EnemyBullet colorbuffers
+		glBindBuffer(GL_ARRAY_BUFFER, e_c_colorbuffer);
+		glBufferData(GL_ARRAY_BUFFER, e_circle_color_buffer_data.size()*sizeof(GLfloat), &e_circle_color_buffer_data[0], GL_STATIC_DRAW);
+
+		glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexAttribDivisor(11, 1);
+
+		//EnemyBullet modelbuffers
+		glBindBuffer(GL_ARRAY_BUFFER, e_c_modelbuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4)*e_ModelMatrixVector.size(), &e_ModelMatrixVector[0], GL_DYNAMIC_DRAW);
+
+		glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*0));
+		glVertexAttribPointer(13, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*1));
+		glVertexAttribPointer(14, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*2));
+		glVertexAttribPointer(15, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)*3));
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexAttribDivisor(12, 1); // 色：弾ごとに一つ->1
+		glVertexAttribDivisor(13, 1);
+		glVertexAttribDivisor(14, 1);
+		glVertexAttribDivisor(15, 1);
+
+		glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, n_gon+2, e_BulletList.size());
+
+		/*敵弾幕の描画終了*/
 
 
 		glDisableVertexAttribArray(0);
@@ -276,6 +346,13 @@ int main() {
 		glDisableVertexAttribArray(5);
 		glDisableVertexAttribArray(6);
 		glDisableVertexAttribArray(7);
+
+		glDisableVertexAttribArray(10);
+		glDisableVertexAttribArray(11);
+		glDisableVertexAttribArray(12);
+		glDisableVertexAttribArray(13);
+		glDisableVertexAttribArray(14);
+		glDisableVertexAttribArray(15);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -291,10 +368,15 @@ int main() {
 		enemy->deleteVertex();
 	}
 
+	glDeleteBuffers(1, &e_c_vertexbuffer);
+	glDeleteBuffers(1, &e_c_colorbuffer);
+	glDeleteBuffers(1, &e_c_modelbuffer);
+
 
 	glDeleteProgram(programID);
 	glDeleteProgram(c_programID);
 	glDeleteProgram(e_programID);
+	glDeleteProgram(e_c_programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
 	glfwTerminate();

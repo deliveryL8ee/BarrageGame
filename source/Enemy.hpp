@@ -72,8 +72,9 @@ class Enemy {
      void setParameter(float E_posX, float E_posY, float E_speedX, float E_speedY, float E_t, float E_life, int E_id, int E_frag);
 	void deleteEnemy(int id);
 	void setID(int id);
+	void getPosition(float *x, float *y);
+	void damege();
      void tick();
-     void isCollide();
      void draw(GLuint e_programID, GLuint e_MatrixID);
 
 };

@@ -1,7 +1,7 @@
 #include <random>
-#include "Bullet.hpp"
+#include "MyBullet.hpp"
 
-Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
+MyBullet::MyBullet(): MyBullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
 	//乱数によって弾幕を様々な色に設定する
 	std::random_device rnd;
 	std::mt19937 mt(rnd());
@@ -14,14 +14,14 @@ Bullet::Bullet(): Bullet(0.0f, 0.0f, 0.0f, 0.0f, 0) {
 	circle_color_buffer_data.push_back(rand2(mt)/2);
 }
 
-Bullet::Bullet(float posX, float posY, float speedX, float speedY, int id): posX(posX), posY(posY), speedX(speedX), speedY(speedY), id(id){
+MyBullet::MyBullet(float posX, float posY, float speedX, float speedY, int id): posX(posX), posY(posY), speedX(speedX), speedY(speedY), id(id){
 }
 
-Bullet::Bullet(const Bullet& rhs): Bullet(rhs.posX, rhs.posY, rhs.speedX, rhs.speedY, rhs.id){
+MyBullet::MyBullet(const MyBullet& rhs): MyBullet(rhs.posX, rhs.posY, rhs.speedX, rhs.speedY, rhs.id){
 }
 
 
-void Bullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id) {
+void MyBullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id) {
 	posX = P_posX;
 	posY = P_posY;
 	speedX = P_speedX;
@@ -30,7 +30,7 @@ void Bullet::setParameter(float P_posX, float P_posY, float P_speedX, float P_sp
 }
 
 //受け取ったIDに該当する弾幕に新しく生成した弾幕情報を上書きし、削除する
-void Bullet::deleteBullet(int id) {
+void MyBullet::deleteBullet(int id) {
 	delete BulletList[id];
 	BulletList[id] = BulletList[BulletList.size()-1];
 	BulletList[id]->setID(id);
@@ -40,15 +40,20 @@ void Bullet::deleteBullet(int id) {
 	ModelMatrixVector.pop_back();
 }
 
-void Bullet::setID(int id) {
+void MyBullet::setID(int id) {
 	this->id = id;
+}
+
+void MyBullet::getPosition(float *x, float *y) {
+	*x = posX;
+	*y = posY;
 }
 
 /*
  * アクティブな弾幕を進め、そうでなければ削除する
  * かつ弾幕のモデル行列を更新する
  */
-void Bullet::tick(){
+void MyBullet::tick(){
 	posX += speedX;
 	posY += speedY;
 
@@ -62,7 +67,7 @@ void Bullet::tick(){
 
 }
 
-std::vector<Bullet*> BulletList;
+std::vector<MyBullet*> BulletList;
 std::vector<GLfloat> circle_vertex_buffer_data;
 std::vector<GLfloat> circle_color_buffer_data;
 std::vector<glm::mat4> ModelMatrixVector;

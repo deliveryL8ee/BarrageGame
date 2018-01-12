@@ -1,5 +1,5 @@
-barragegame: main.o shader.o controls.o Bullet.o Enemy.o
-	g++ --std=c++14 -o barragegame main.o shader.o controls.o Bullet.o Enemy.o -lGL -lGLU -lglfw -lXrandr -lXi -lXxf86vm -lX11 -lrt -lm -lpthread -lGLEW -ldl
+barragegame: main.o shader.o controls.o MyBullet.o Enemy.o EnemyBullet.o
+	g++ --std=c++14 -o barragegame main.o shader.o controls.o MyBullet.o Enemy.o EnemyBullet.o -lGL -lGLU -lglfw -lXrandr -lXi -lXxf86vm -lX11 -lrt -lm -lpthread -lGLEW -ldl
 
 main.o: main.cpp
 	g++ --std=c++14 -c main.cpp 
@@ -10,13 +10,16 @@ shader.o: shader.cpp shader.hpp
 controls.o: controls.cpp
 	g++ --std=c++14 -c controls.cpp
 
-Bullet.o: Bullet.cpp
-	g++ --std=c++14 -c Bullet.cpp
+MyBullet.o: MyBullet.cpp
+	g++ --std=c++14 -c MyBullet.cpp
 
 Enemy.o: Enemy.cpp
 	g++ --std=c++14 -c Enemy.cpp
 
+EnemyBullet.o: EnemyBullet.cpp
+	g++ --std=c++14 -c EnemyBullet.cpp
+
 clean:
-	rm main.o shader.o controls.o Bullet.o Enemy.o
+	rm main.o shader.o controls.o MyBullet.o Enemy.o EnemyBullet.o
 	
 

@@ -77,6 +77,15 @@ void Enemy::setID(int id) {
 	this->id = id;
 }
 
+void Enemy::getPosition(float *x, float *y) {
+	*x = posX;
+	*y = posY;
+}
+
+void Enemy::damege(){
+	life -= 0.005f;
+}
+
 /*
  * アクティブな敵を動かし、そうでなければ削除する
  * フラグを引数として受け取り、それによって座標計算を変える
@@ -122,15 +131,10 @@ void Enemy::tick(){
 
 
 	//life of Enemy was lost
-	if(life == DEAD) {
+	if(life <= DEAD) {
 		deleteEnemy(id);			//倒した敵を削除する
 	}
 		
-}
-
-//当たり判定
-void Enemy::isCollide(){
-	//if() life -= 0.01;
 }
 
 void Enemy::draw(GLuint e_programID, GLuint e_MatrixID) {

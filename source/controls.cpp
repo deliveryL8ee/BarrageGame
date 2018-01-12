@@ -32,6 +32,8 @@ float e_posY = 3*height/4.0f;
 //speed of player moving
 float speed = 5.0f;
 
+float playerLife = 5.0f;
+
 
 //change pattern of Enemy movement
 int getFrag(){
@@ -83,16 +85,25 @@ void computeMatricesFromInputs(){
 	}
 
      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		BulletList.push_back(new Bullet());							//弾幕の作成
+		BulletList.push_back(new MyBullet());							//弾幕の作成
 		BulletList[BulletList.size()-1]->setParameter(posX, posY+scaleVec, 0.0f, 15.0f, BulletList.size()-1);		//弾幕にパラメータをセット
-		BulletList.push_back(new Bullet());
+		BulletList.push_back(new MyBullet());
 		BulletList[BulletList.size()-1]->setParameter(posX, posY+scaleVec, 2.0f, 15.0f, BulletList.size()-1);
-		BulletList.push_back(new Bullet());
+		BulletList.push_back(new MyBullet());
 		BulletList[BulletList.size()-1]->setParameter(posX, posY+scaleVec, -2.0f, 15.0f, BulletList.size()-1);
 
 		ModelMatrixVector.push_back(glm::mat4());
 		ModelMatrixVector.push_back(glm::mat4());
 		ModelMatrixVector.push_back(glm::mat4());
+     }
+
+     if (glfwGetKey(window, 'O') == GLFW_PRESS) {
+		for(float i = 0.0; i < 2.0; i += 0.2){
+			e_BulletList.push_back(new EnemyBullet());							//弾幕の作成
+			e_BulletList[e_BulletList.size()-1]->setParameter(posX, posY+scaleVec, 5*cos(i*M_PI), 5*sin(i*M_PI), e_BulletList.size()-1);		//弾幕にパラメータをセット
+
+			e_ModelMatrixVector.push_back(glm::mat4());
+		}
      }
 
 
@@ -101,3 +112,34 @@ void computeMatricesFromInputs(){
 
 }
 
+//当たり判定
+/*
+ * 引数は左から円1の半径、円2の半径、円1のx座標、円2のx座標、円1のy座標、円2のy座標
+ * rlengthよりもお互いの円の中心座標の距離が短ければ当たっているという判定
+ */
+
+bool isCollide(float r1, float r2, float x1, float x2, float y1, float y2){
+	float rlength = r1 + r2;		//半径同士を足し合わせた値
+	float xlength = x1 - x2;
+	float ylength = y1 - y2;
+
+	if(rlength*rlength >= xlength*xlength + ylength*ylength) return true;
+	else return false;
+}
+
+void CollisionAll(){
+	float pbx, pby, ex, ey, ebx, eby;
+	for(auto bullet : BulletList){
+		for(auto enemy : EnemyGroup){
+			bullet->getPosition(&pbx, &pby);
+			enemy->getPosition(&ex, &ey);
+			if(isCollide(scaleVec, 20.0f, pbx, ex, pby, ey)) enemy->damege();	//自機弾幕と敵の当たり判定
+		}
+	}
+	for(auto bullet : e_BulletList){
+		bullet->getPosition(&pbx, &pby);
+		//if(isCollide(scaleVec, 20.0f, posX, ebx, posY, eby)) playerLife -= 1.0f;	//自機と敵弾幕の当たり判定
+
+		//if(playerLife <= 0.0f) std::cout << "score is ... " << score << std::endl;
+	}
+}

@@ -1,5 +1,5 @@
-#ifndef BULLET_HPP
-#define BULLET_HPP
+#ifndef MYBULLET_HPP
+#define MYBULLET_HPP
 
 #include <vector>
 #include <cmath>
@@ -25,7 +25,7 @@ extern GLFWwindow* window;
 
 #include "controls.hpp"
 
-class Bullet {
+class MyBullet {
      float width = 768.0f;
      float height = 768.0f;
 
@@ -39,11 +39,11 @@ class Bullet {
 	glm::mat4 c_Model;
 
      public:
-     Bullet();
-     Bullet(float posX, float posY, float speedX, float speedY, int id);
-     Bullet(const Bullet& rhs);
+     MyBullet();
+     MyBullet(float posX, float posY, float speedX, float speedY, int id);
+     MyBullet(const MyBullet& rhs);
 
-     Bullet& operator=(const Bullet& rhs){
+     MyBullet& operator=(const MyBullet& rhs){
 	  this->posX   = rhs.posX;
 	  this->posY   = rhs.posY;
 	  this->speedX = rhs.speedX;
@@ -54,11 +54,12 @@ class Bullet {
      void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id);
 	void deleteBullet(int id);
 	void setID(int id);
+	void getPosition(float *x, float *y);
      void tick();
 
 };
 
-extern std::vector<Bullet*> BulletList;
+extern std::vector<MyBullet*> BulletList;
 extern std::vector<GLfloat> circle_vertex_buffer_data;		//頂点情報
 extern std::vector<GLfloat> circle_color_buffer_data;		//色情報
 extern std::vector<glm::mat4> ModelMatrixVector;

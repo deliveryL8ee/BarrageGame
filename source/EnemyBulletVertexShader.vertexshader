@@ -1,0 +1,14 @@
+#version 330 core
+layout(location = 10) in vec3 vertexPosition_modelspace;
+layout(location = 11) in vec4 BulletColor;
+layout(location = 12) in mat4 ModelMatrix;
+
+out vec4 fragmentColor;
+uniform mat4 e_c_VP;
+
+
+void main() {
+	mat4 MVP = e_c_VP * ModelMatrix;
+     gl_Position = MVP * vec4(vertexPosition_modelspace, 1);
+     fragmentColor = BulletColor;
+}
