@@ -65,6 +65,8 @@ class Enemy {
 	  this->life = rhs.life;
 	  this->id   = rhs.id;
 	  this->frag = rhs.frag;
+	  
+	  return (*this);
      }
 
 	void createVertex();
@@ -80,6 +82,7 @@ class Enemy {
 };
 
 extern std::vector<Enemy*> EnemyGroup;
+extern int score;
 
 
 #endif

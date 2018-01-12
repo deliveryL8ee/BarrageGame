@@ -36,7 +36,7 @@ float playerLife = 5.0f;
 
 
 //change pattern of Enemy movement
-int getFrag(){
+void getFrag(){
 	//Get fragment by pressing key of number
      if (glfwGetKey(window, '1') == GLFW_PRESS){
 		frag = 1;
@@ -77,11 +77,9 @@ void computeMatricesFromInputs(){
 	  if(posX < 0.0f+scaleVec) posX = 0.0f+scaleVec;
      }
      
-     if (glfwGetKey(window, 'P') == GLFW_PRESS) {
-		if(EnemyGroup.size() < 20){
-			EnemyGroup.push_back(new Enemy());							//敵の作成
-			EnemyGroup[EnemyGroup.size()-1]->setParameter(e_posX, e_posY, 5.0f, 5.0f, 0.0f, 1.0f, EnemyGroup.size()-1, frag);		//敵にパラメータをセット
-		}
+     if (glfwGetKey(window, 'P') == GLFW_PRESS && glfwGetKey(window, 'P') == GLFW_RELEASE){
+		EnemyGroup.push_back(new Enemy());							//敵の作成
+		EnemyGroup[EnemyGroup.size()-1]->setParameter(e_posX, e_posY, 5.0f, 5.0f, 0.0f, 1.0f, EnemyGroup.size()-1, frag);		//敵にパラメータをセット
 	}
 
      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -98,11 +96,16 @@ void computeMatricesFromInputs(){
      }
 
      if (glfwGetKey(window, 'O') == GLFW_PRESS) {
-		for(float i = 0.0; i < 2.0; i += 0.2){
-			e_BulletList.push_back(new EnemyBullet());							//弾幕の作成
-			e_BulletList[e_BulletList.size()-1]->setParameter(posX, posY+scaleVec, 5*cos(i*M_PI), 5*sin(i*M_PI), e_BulletList.size()-1);		//弾幕にパラメータをセット
+		float ex, ey;
+		for(auto enemy : EnemyGroup){
+			enemy->getPosition(&ex, &ey);
 
-			e_ModelMatrixVector.push_back(glm::mat4());
+			for(float i = 0.0; i < 2.0; i += 0.2){
+				e_BulletList.push_back(new EnemyBullet());							//弾幕の作成
+				e_BulletList[e_BulletList.size()-1]->setParameter(ex, ey, 5*cos(i*M_PI), 5*sin(i*M_PI), e_BulletList.size()-1);		//弾幕にパラメータをセット
+
+				e_ModelMatrixVector.push_back(glm::mat4());
+			}
 		}
      }
 
@@ -137,9 +140,13 @@ void CollisionAll(){
 		}
 	}
 	for(auto bullet : e_BulletList){
-		bullet->getPosition(&pbx, &pby);
-		//if(isCollide(scaleVec, 20.0f, posX, ebx, posY, eby)) playerLife -= 1.0f;	//自機と敵弾幕の当たり判定
+		bullet->getPosition(&ebx, &eby);
+		if(isCollide(scaleVec, 20.0f, posX, ebx, posY, eby)) playerLife -= 0.01f;	//自機と敵弾幕の当たり判定
 
-		//if(playerLife <= 0.0f) std::cout << "score is ... " << score << std::endl;
+		if(playerLife <= 0.0f){
+			std::cout << std::endl;
+			std::cout << "score is ... " << score << std::endl;
+			exit(0);
+		}
 	}
 }

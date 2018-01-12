@@ -133,6 +133,7 @@ void Enemy::tick(){
 	//life of Enemy was lost
 	if(life <= DEAD) {
 		deleteEnemy(id);			//倒した敵を削除する
+		score++;
 	}
 		
 }
@@ -164,4 +165,5 @@ void Enemy::draw(GLuint e_programID, GLuint e_MatrixID) {
 }
 
 std::vector<Enemy*> EnemyGroup;
+int score = 0;
 

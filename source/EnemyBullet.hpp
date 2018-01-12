@@ -49,6 +49,8 @@ class EnemyBullet {
 	  this->speedX = rhs.speedX;
 	  this->speedY = rhs.speedY;
 	  this->id   = rhs.id;
+	  
+	  return (*this);
      }
 
      void setParameter(float E_posX, float E_posY, float E_speedX, float E_speedY, int E_id);

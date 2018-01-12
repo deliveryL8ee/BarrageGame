@@ -50,8 +50,6 @@ void EnemyBullet::tick(){
 	posX += speedX;
 	posY += speedY;
 
-	std::cout << "(" << posX << ", " << posY << ")" << std::endl;
-
 	if(posX+10.0f < 0.0f || posX-10.0f > width+10.0f || posY+10.0f < 0.0 || posY-10.0f > height+10.0f) {
 		deleteBullet(id);			//使い終わった弾幕を削除する
 	}

@@ -98,8 +98,6 @@ int main() {
      glm::mat4 c_View = glm::lookAt(glm::vec3(0,0,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
      glm::mat4 c_VP = c_Projection * c_View;
 
-	glm::mat4 e_MVP = Projection * View * Model;
-
      glm::mat4 e_c_Projection = glm::ortho(0.0f, width, 0.0f, height, 0.0f, 5.0f);
      glm::mat4 e_c_View = glm::lookAt(glm::vec3(0,0,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
      glm::mat4 e_c_VP = e_c_Projection * e_c_View;
@@ -144,6 +142,18 @@ int main() {
 		circle_vertex_buffer_data.push_back(cos(M_PI*2/n_gon*i));
 		circle_vertex_buffer_data.push_back(sin(M_PI*2/n_gon*i));
 		circle_vertex_buffer_data.push_back(0.0f);
+	}
+
+	/*敵弾幕を表す配列*/
+	//頂点情報->vertex、色情報->colorにpush_back()
+	e_circle_vertex_buffer_data.push_back(0.0f);
+	e_circle_vertex_buffer_data.push_back(0.0f);
+	e_circle_vertex_buffer_data.push_back(0.0f);
+
+	for(int i = 0; i < n_gon+1; i++) {
+		e_circle_vertex_buffer_data.push_back(0.5*cos(M_PI*2/n_gon*i));
+		e_circle_vertex_buffer_data.push_back(0.5*sin(M_PI*2/n_gon*i));
+		e_circle_vertex_buffer_data.push_back(0.0f);
 	}
 
 

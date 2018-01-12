@@ -19,7 +19,7 @@ extern GLFWwindow* window;
 
 
 void computeMatricesFromInputs();
-int getFrag();
+void getFrag();
 bool isCollide(float r1, float r2, float x1, float x2, float y1, float y2);
 void CollisionAll();
 glm::mat4 getModelMatrix();

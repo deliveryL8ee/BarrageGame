@@ -49,6 +49,8 @@ class MyBullet {
 	  this->speedX = rhs.speedX;
 	  this->speedY = rhs.speedY;
 	  this->id   = rhs.id;
+	  
+	  return (*this);
      }
 
      void setParameter(float P_posX, float P_posY, float P_speedX, float P_speedY, int P_id);
